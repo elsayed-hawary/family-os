@@ -1,3 +1,4 @@
+# backend/events/sse.py
 from flask import Blueprint, Response, jsonify, stream_with_context, request
 from flask_jwt_extended import decode_token
 import queue
@@ -36,8 +37,6 @@ def send_notification(user_id, notification_data):
     if user_id in connections:
         connections[user_id].put(notification_data)
         logger.debug(f"Notification sent to user {user_id}")
-    else:
-        logger.debug(f"User {user_id} not connected")
 
 @sse_bp.route('/stream')
 def stream():
