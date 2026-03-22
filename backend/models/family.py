@@ -1,3 +1,4 @@
+# backend/models/family.py
 from backend.models import db
 from datetime import datetime
 import secrets
@@ -38,9 +39,6 @@ class Family(db.Model):
             'createdAt': self.created_at.isoformat() if self.created_at else None,
             'memberCount': self.member_count()
         }
-    
-    def get_join_link(self, base_url):
-        return f"{base_url}/join/{self.family_code}"
 
 class JoinRequest(db.Model):
     __tablename__ = 'join_requests'
