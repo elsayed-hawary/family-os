@@ -1,3 +1,4 @@
+# backend/models/user.py
 from backend.models import db
 from datetime import datetime
 import bcrypt
@@ -41,22 +42,18 @@ class User(db.Model):
             return
         salt = bcrypt.gensalt()
         self.password_hash = bcrypt.hashpw(password.encode('utf-8'), salt).decode('utf-8')
-        logger.info(f"Password set for user {self.id}")
     
     def check_password(self, password):
         if not self.password_hash or not password:
-            logger.warning(f"Password check failed for user {self.id}: missing hash or password")
             return False
         try:
             return bcrypt.checkpw(password.encode('utf-8'), self.password_hash.encode('utf-8'))
-        except Exception as e:
-            logger.error(f"Password check error for user {self.id}: {e}")
+        except Exception:
             return False
     
     def update_last_login(self):
         self.last_login = datetime.utcnow()
         db.session.commit()
-        logger.info(f"User {self.id} logged in")
     
     def to_dict(self, include_permissions=False):
         result = {
