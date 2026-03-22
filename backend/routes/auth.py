@@ -14,12 +14,11 @@ def register():
     data = request.json
     logger.info(f"Registration attempt for {data.get('email')}")
     
-    # Validate required fields
     if not data.get('fullName'):
         return jsonify({'success': False, 'message': 'Full name is required'}), 400
     
     if not validate_name(data['fullName']):
-        return jsonify({'success': False, 'message': 'Invalid name format (2-100 chars, letters only)'}), 400
+        return jsonify({'success': False, 'message': 'Invalid name format'}), 400
     
     if data.get('email') and not validate_email(data['email']):
         return jsonify({'success': False, 'message': 'Invalid email format'}), 400
@@ -30,13 +29,11 @@ def register():
     if data.get('password') and not validate_password(data['password']):
         return jsonify({'success': False, 'message': 'Password must be at least 8 chars with uppercase, lowercase and number'}), 400
     
-    # Check if email already exists
     if data.get('email'):
         existing = User.query.filter_by(email=data['email']).first()
         if existing:
             return jsonify({'success': False, 'message': 'Email already registered'}), 409
     
-    # Create user
     unique_id = User.generate_unique_id(data['fullName'])
     
     user = User(
@@ -44,7 +41,7 @@ def register():
         full_name=data['fullName'],
         email=data.get('email'),
         phone=data.get('phone'),
-        role=data['role'] if data.get('role') else 'member',
+        role=data.get('role', 'member'),
         birth_date=datetime.fromisoformat(data['birthDate']) if data.get('birthDate') else None,
         bio=data.get('bio'),
         is_family_head=True
@@ -56,7 +53,6 @@ def register():
     db.session.add(user)
     db.session.flush()
     
-    # Create family
     family = Family(
         family_code=Family.generate_family_code(),
         name=f"Семья {user.full_name}",
@@ -67,14 +63,12 @@ def register():
     
     user.family_id = family.id
     
-    # Create family settings
     settings = FamilySettings(family_id=family.id)
     db.session.add(settings)
     
     db.session.commit()
     user.update_last_login()
     
-    # Generate token
     access_token = create_access_token(identity=user.id)
     
     logger.info(f"User registered successfully: {unique_id}")
@@ -156,7 +150,6 @@ def join_family(family_code):
     if not family:
         return jsonify({'success': False, 'message': 'Family not found'}), 404
     
-    # Validate
     if not data.get('fullName'):
         return jsonify({'success': False, 'message': 'Full name required'}), 400
     
@@ -166,18 +159,15 @@ def join_family(family_code):
     if data.get('email') and not validate_email(data['email']):
         return jsonify({'success': False, 'message': 'Invalid email format'}), 400
     
-    # Check if email already exists
     if data.get('email'):
         existing_email = User.query.filter_by(email=data['email']).first()
         if existing_email:
             return jsonify({'success': False, 'message': 'Email already registered'}), 409
     
-    # Check if user already in family
     existing = User.query.filter_by(email=data.get('email')).first()
     if existing and existing.family_id == family.id:
         return jsonify({'success': False, 'message': 'User already in this family'}), 409
     
-    # Create user account
     unique_id = User.generate_unique_id(data['fullName'])
     
     user = User(
@@ -198,7 +188,6 @@ def join_family(family_code):
     db.session.add(user)
     db.session.flush()
     
-    # Create join request
     join_request = JoinRequest(
         family_id=family.id,
         user_id=user.id,
@@ -208,7 +197,6 @@ def join_family(family_code):
     
     db.session.commit()
     
-    # Notify family head
     family_head = User.query.get(family.created_by)
     if family_head:
         NotificationService.add_notification(

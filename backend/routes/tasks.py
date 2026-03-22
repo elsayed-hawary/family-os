@@ -14,11 +14,7 @@ tasks_bp = Blueprint('tasks', __name__)
 @require_family_access
 def get_tasks(user, family):
     tasks = Task.query.filter_by(family_id=family.id).order_by(Task.created_at.desc()).all()
-    
-    return jsonify({
-        'success': True,
-        'tasks': [t.to_dict() for t in tasks]
-    })
+    return jsonify({'success': True, 'tasks': [t.to_dict() for t in tasks]})
 
 @tasks_bp.route('', methods=['POST'])
 @jwt_required()
@@ -28,12 +24,10 @@ def create_task(user, family):
     data = request.json
     logger.info(f"Creating task for family {family.id} by user {user.id}")
     
-    # Validate
     is_valid, error = validate_task_data(data)
     if not is_valid:
         return jsonify({'success': False, 'message': error}), 400
     
-    # Check assignee exists and is in same family
     assignee_id = data.get('assigneeId')
     assignee = None
     if assignee_id:
@@ -54,7 +48,6 @@ def create_task(user, family):
     db.session.add(task)
     db.session.flush()
     
-    # Create notification for assignee
     if assignee_id and assignee_id != user.id:
         NotificationService.add_notification(
             user_id=assignee_id,
@@ -78,7 +71,6 @@ def update_task(user, family, task_id):
     if not task:
         return jsonify({'success': False, 'message': 'Task not found'}), 404
     
-    # Check permission
     if task.family_id != family.id:
         return jsonify({'success': False, 'message': 'Access denied'}), 403
     
@@ -88,11 +80,8 @@ def update_task(user, family, task_id):
     data = request.json
     logger.info(f"Updating task {task_id}")
     
-    # Handle completion
     if data.get('status') == 'completed' and task.status != 'completed':
         task.complete()
-        
-        # Notify creator if different
         if task.created_by != user.id:
             NotificationService.add_notification(
                 user_id=task.created_by,
@@ -102,12 +91,10 @@ def update_task(user, family, task_id):
                 related_id=task.id
             )
     
-    # Update fields
     for key in ['title', 'description', 'priority']:
         if key in data:
             setattr(task, key, data[key])
     
-    # Handle assignee separately (frontend sends 'assigneeId')
     if 'assigneeId' in data:
         assignee_id = data['assigneeId']
         if assignee_id:
@@ -142,7 +129,6 @@ def delete_task(user, family, task_id):
     
     db.session.delete(task)
     db.session.commit()
-    
     logger.info(f"Task {task_id} deleted")
     
     return jsonify({'success': True})
