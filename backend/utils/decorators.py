@@ -44,7 +44,6 @@ def require_permission(permission):
             if user.is_family_head:
                 return f(*args, **kwargs)
             
-            # Check specific permission
             permissions = user.get_permissions()
             if permissions.get(permission, False):
                 return f(*args, **kwargs)
