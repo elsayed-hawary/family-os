@@ -16,9 +16,9 @@ class FamilyApp {
     
     async init() {
         const token = localStorage.getItem('token');
-        const publicPages = ['/login.html', '/register.html', '/join.html'];
-        const isPublicPage = publicPages.includes(window.location.pathname) || 
-                            window.location.pathname.includes('/join/');
+        const publicPages = ['/login.html', '/register.html'];
+        const isJoinPage = window.location.pathname.includes('/join/');
+        const isPublicPage = publicPages.includes(window.location.pathname) || isJoinPage;
         
         if (token && !isPublicPage) {
             await this.loadCurrentUser();
@@ -289,7 +289,6 @@ class FamilyApp {
     }
     
     showToast(title, message) {
-        // Remove existing toast
         const existing = document.querySelector('.toast-notification');
         if (existing) existing.remove();
         
