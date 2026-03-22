@@ -1,3 +1,4 @@
+# backend/routes/__init__.py
 from backend.routes.auth import auth_bp
 from backend.routes.tasks import tasks_bp
 from backend.routes.expenses import expenses_bp
