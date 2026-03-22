@@ -28,10 +28,15 @@ class API {
             const response = await fetch(`${API_BASE}${endpoint}`, options);
             const result = await response.json();
             
-            // Don't logout on login endpoint errors
-            if (response.status === 401 && endpoint !== '/api/auth/login' && endpoint !== '/api/auth/register') {
+            // Don't logout on login/register endpoints
+            if (response.status === 401 && 
+                endpoint !== '/api/auth/login' && 
+                endpoint !== '/api/auth/register' &&
+                !endpoint.includes('/join/')) {
                 this.logout();
-                if (!window.location.pathname.includes('/login') && !window.location.pathname.includes('/register')) {
+                if (!window.location.pathname.includes('/login') && 
+                    !window.location.pathname.includes('/register') &&
+                    !window.location.pathname.includes('/join')) {
                     window.location.href = '/login.html';
                 }
             }
