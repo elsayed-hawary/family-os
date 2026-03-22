@@ -18,7 +18,6 @@ class Config:
     
     SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL')
     if not SQLALCHEMY_DATABASE_URI:
-        import os
         base_dir = os.path.abspath(os.path.dirname(__file__))
         SQLALCHEMY_DATABASE_URI = f'sqlite:///{os.path.join(base_dir, "../instance/family.db")}'
     
@@ -28,6 +27,5 @@ class Config:
         'pool_recycle': 300,
     }
     
-    # Rate limiting
     RATELIMIT_DEFAULT = "200 per day"
     RATELIMIT_STORAGE_URL = "memory://"
