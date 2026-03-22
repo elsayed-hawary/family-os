@@ -1,3 +1,4 @@
+# backend/services/notification_service.py
 from backend.models import db, Notification
 from backend.events.sse import send_notification
 from backend import logger
@@ -7,7 +8,6 @@ from datetime import datetime
 class NotificationService:
     @staticmethod
     def add_notification(user_id, title, message, type='info', related_id=None):
-        """Add notification to database and send via SSE"""
         try:
             notification = Notification(
                 user_id=user_id,
@@ -19,7 +19,6 @@ class NotificationService:
             db.session.add(notification)
             db.session.flush()
             
-            # Prepare data for SSE
             notification_data = {
                 'id': notification.id,
                 'title': title,
@@ -29,7 +28,6 @@ class NotificationService:
                 'createdAt': datetime.utcnow().isoformat()
             }
             
-            # Send via SSE
             send_notification(user_id, notification_data)
             logger.debug(f"Notification added for user {user_id}: {title}")
             
@@ -44,7 +42,6 @@ class NotificationService:
         if notification:
             notification.read = True
             db.session.commit()
-            logger.debug(f"Notification {notification_id} marked as read")
             return True
         return False
     
@@ -52,7 +49,7 @@ class NotificationService:
     def mark_all_read(user_id):
         count = Notification.query.filter_by(user_id=user_id, read=False).update({'read': True})
         db.session.commit()
-        logger.info(f"Marked {count} notifications as read for user {user_id}")
+        return count
     
     @staticmethod
     def get_unread_count(user_id):
