@@ -13,7 +13,6 @@ sse_bp = Blueprint('sse', __name__)
 connections = {}
 
 def event_stream(user_id):
-    """Generate SSE events for a user"""
     if user_id not in connections:
         connections[user_id] = queue.Queue()
     
@@ -33,14 +32,12 @@ def event_stream(user_id):
             del connections[user_id]
 
 def send_notification(user_id, notification_data):
-    """Send notification to a specific user"""
     if user_id in connections:
         connections[user_id].put(notification_data)
         logger.debug(f"Notification sent to user {user_id}")
 
 @sse_bp.route('/stream')
 def stream():
-    """SSE endpoint - token passed as query parameter"""
     token = request.args.get('token')
     
     if not token:
