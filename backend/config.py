@@ -1,3 +1,4 @@
+# backend/config.py
 import os
 from datetime import timedelta
 from dotenv import load_dotenv
@@ -5,14 +6,8 @@ from dotenv import load_dotenv
 load_dotenv()
 
 class Config:
-    SECRET_KEY = os.environ.get('SECRET_KEY')
-    if not SECRET_KEY:
-        raise ValueError("SECRET_KEY must be set in environment")
-    
-    JWT_SECRET_KEY = os.environ.get('JWT_SECRET_KEY')
-    if not JWT_SECRET_KEY:
-        raise ValueError("JWT_SECRET_KEY must be set in environment")
-    
+    SECRET_KEY = os.environ.get('SECRET_KEY', 'dev-secret-key-change-in-production')
+    JWT_SECRET_KEY = os.environ.get('JWT_SECRET_KEY', 'dev-jwt-secret-key-change')
     JWT_ACCESS_TOKEN_EXPIRES = timedelta(days=30)
     JWT_REFRESH_TOKEN_EXPIRES = timedelta(days=90)
     
