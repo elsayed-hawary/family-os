@@ -14,9 +14,7 @@ from backend.events.sse import sse_bp
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s [%(levelname)s] %(message)s',
-    handlers=[
-        logging.StreamHandler()
-    ]
+    handlers=[logging.StreamHandler()]
 )
 
 logger = logging.getLogger(__name__)
@@ -31,7 +29,7 @@ def create_app(config_class=Config):
     
     # Initialize extensions
     CORS(app, supports_credentials=True)
-    jwt = JWTManager(app)
+    JWTManager(app)
     db.init_app(app)
     migrate.init_app(app, db)
     limiter.init_app(app)
