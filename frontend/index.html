@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Моя Семья - Семейный менеджер</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Side Menu -->
+        <div class="side-menu" id="sideMenu">
+            <div class="side-menu-header">
+                <h3 id="userName">Загрузка...</h3>
+                <p id="userRole">Роль: ---</p>
+                <p id="userBadge" style="font-size: 12px;"></p>
+            </div>
+            <nav class="side-menu-nav">
+                <a href="/" class="side-menu-item active">
+                    <i class="fas fa-house"></i>
+                    <span>Главная</span>
+                </a>
+                <a href="/tasks.html" class="side-menu-item">
+                    <i class="fas fa-list-check"></i>
+                    <span>Задачи</span>
+                </a>
+                <a href="/expenses.html" class="side-menu-item">
+                    <i class="fas fa-wallet"></i>
+                    <span>Расходы</span>
+                </a>
+                <a href="/events.html" class="side-menu-item">
+                    <i class="fas fa-calendar-star"></i>
+                    <span>События</span>
+                </a>
+                <a href="/children.html" class="side-menu-item">
+                    <i class="fas fa-child"></i>
+                    <span>Дети</span>
+                </a>
+                <a href="/settings.html" class="side-menu-item">
+                    <i class="fas fa-gear"></i>
+                    <span>Настройки</span>
+                </a>
+                <div class="side-menu-item" onclick="app.logout()">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Выйти</span>
+                </div>
+            </nav>
+        </div>
+        <div class="side-menu-overlay" id="sideMenuOverlay" onclick="app.closeSideMenu()"></div>
+        
+        <!-- Header -->
+        <div class="header">
+            <button class="menu-btn" onclick="app.openSideMenu()">
+                <i class="fas fa-bars"></i>
+            </button>
+            <div class="header-title">Моя Семья</div>
+            <div class="header-actions">
+                <button class="icon-btn" id="notificationsBtn" onclick="window.location.href='/notifications.html'">
+                    <i class="fas fa-bell"></i>
+                    <span class="notification-badge" id="notificationBadge" style="display: none;">0</span>
+                </button>
+            </div>
+        </div>
+        
+        <!-- Content -->
+        <div class="content">
+            <!-- Stats Grid -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon"><i class="fas fa-tasks"></i></div>
+                    <div class="stat-value" id="pendingTasksCount">0</div>
+                    <div class="stat-label">Задач</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon"><i class="fas fa-wallet"></i></div>
+                    <div class="stat-value" id="totalExpenses">0</div>
+                    <div class="stat-label">Расходов</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon"><i class="fas fa-calendar"></i></div>
+                    <div class="stat-value" id="upcomingEvents">0</div>
+                    <div class="stat-label">Событий</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon"><i class="fas fa-child"></i></div>
+                    <div class="stat-value" id="childrenCount">0</div>
+                    <div class="stat-label">Детей</div>
+                </div>
+            </div>
+            
+            <!-- Recent Tasks -->
+            <div class="section-card">
+                <div class="section-header">
+                    <h3><i class="fas fa-list-check"></i> Активные задачи</h3>
+                    <button class="small-btn" onclick="window.location.href='/tasks.html'">Все</button>
+                </div>
+                <div id="tasksList" class="tasks-list"></div>
+            </div>
+            
+            <!-- Recent Expenses -->
+            <div class="section-card">
+                <div class="section-header">
+                    <h3><i class="fas fa-chart-line"></i> Последние расходы</h3>
+                    <button class="small-btn" onclick="window.location.href='/expenses.html'">Все</button>
+                </div>
+                <div id="expensesList" class="expenses-list"></div>
+            </div>
+            
+            <!-- Upcoming Events -->
+            <div class="section-card">
+                <div class="section-header">
+                    <h3><i class="fas fa-calendar-star"></i> Предстоящие события</h3>
+                    <button class="small-btn" onclick="window.location.href='/events.html'">Все</button>
+                </div>
+                <div id="eventsList" class="events-list"></div>
+            </div>
+            
+            <!-- Children -->
+            <div class="section-card">
+                <div class="section-header">
+                    <h3><i class="fas fa-child"></i> Дети</h3>
+                    <button class="small-btn" onclick="window.location.href='/children.html'">Управление</button>
+                </div>
+                <div id="childrenList" class="family-list"></div>
+            </div>
+        </div>
+        
+        <!-- Tab Bar -->
+        <div class="tab-bar">
+            <div class="tab-item active" data-tab="home">
+                <i class="fas fa-house"></i>
+                <span>Главная</span>
+            </div>
+            <div class="tab-item" data-tab="tasks" onclick="window.location.href='/tasks.html'">
+                <i class="fas fa-list-check"></i>
+                <span>Задачи</span>
+            </div>
+            <div class="tab-item" data-tab="expenses" onclick="window.location.href='/expenses.html'">
+                <i class="fas fa-wallet"></i>
+                <span>Расходы</span>
+            </div>
+            <div class="tab-item" data-tab="events" onclick="window.location.href='/events.html'">
+                <i class="fas fa-calendar"></i>
+                <span>События</span>
+            </div>
+            <div class="tab-item" data-tab="children" onclick="window.location.href='/children.html'">
+                <i class="fas fa-child"></i>
+                <span>Дети</span>
+            </div>
+        </div>
+    </div>
+    
+    <script src="/js/api.js"></script>
+    <script src="/js/app.js"></script>
+</body>
+</html>
