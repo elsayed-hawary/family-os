@@ -1,33 +1,49 @@
-import os
-from datetime import timedelta
-from dotenv import load_dotenv
+import re
 
-load_dotenv()
+def validate_email(email):
+    if not email:
+        return True
+    pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
+    return re.match(pattern, email) is not None
 
-class Config:
-    SECRET_KEY = os.environ.get('SECRET_KEY')
-    if not SECRET_KEY:
-        raise ValueError("SECRET_KEY must be set in environment")
-    
-    JWT_SECRET_KEY = os.environ.get('JWT_SECRET_KEY')
-    if not JWT_SECRET_KEY:
-        raise ValueError("JWT_SECRET_KEY must be set in environment")
-    
-    JWT_ACCESS_TOKEN_EXPIRES = timedelta(days=30)
-    JWT_REFRESH_TOKEN_EXPIRES = timedelta(days=90)
-    
-    SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL')
-    if not SQLALCHEMY_DATABASE_URI:
-        import os
-        base_dir = os.path.abspath(os.path.dirname(__file__))
-        SQLALCHEMY_DATABASE_URI = f'sqlite:///{os.path.join(base_dir, "../instance/family.db")}'
-    
-    SQLALCHEMY_TRACK_MODIFICATIONS = False
-    SQLALCHEMY_ENGINE_OPTIONS = {
-        'pool_pre_ping': True,
-        'pool_recycle': 300,
-    }
-    
-    # Rate limiting
-    RATELIMIT_DEFAULT = "200 per day"
-    RATELIMIT_STORAGE_URL = "memory://"
+def validate_phone(phone):
+    if not phone:
+        return True
+    pattern = r'^[\+\d\s\-\(\)]{8,20}$'
+    return re.match(pattern, phone) is not None
+
+def validate_name(name):
+    """Supports Arabic, English, spaces, hyphens, dots"""
+    if not name:
+        return False
+    # Arabic: \u0600-\u06FF, English: a-zA-Z, plus spaces, hyphens, dots
+    pattern = r'^[a-zA-Z\u0600-\u06FF\s\-\.]{2,100}$'
+    return re.match(pattern, name) is not None
+
+def validate_password(password):
+    """Password must be at least 8 chars, contain uppercase, lowercase, and number"""
+    if not password:
+        return False
+    pattern = r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$'
+    return re.match(pattern, password) is not None
+
+def validate_task_data(data):
+    if not data.get('title'):
+        return False, 'Title is required'
+    if len(data['title']) > 200:
+        return False, 'Title too long'
+    return True, None
+
+def validate_expense_data(data):
+    if not data.get('description'):
+        return False, 'Description is required'
+    if not data.get('amount') or float(data.get('amount', 0)) <= 0:
+        return False, 'Valid amount is required'
+    return True, None
+
+def validate_event_data(data):
+    if not data.get('title'):
+        return False, 'Title is required'
+    if not data.get('date'):
+        return False, 'Date is required'
+    return True, None
